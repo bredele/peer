@@ -235,11 +235,12 @@ function call() {
 
   remotePeerConnection = new RTCPeerConnection(servers);
   trace("Created remote peer connection object remotePeerConnection");
-  remotePeerConnection.onicecandidate = gotRemoteIceCandidate;
   remotePeerConnection.onaddstream = gotRemoteStream;
+  remotePeerConnection.onicecandidate = gotRemoteIceCandidate;
 
-  localPeerConnection.addStream(localStream);
   trace("Added localStream to localPeerConnection");
+  // have to attach stream before creating offer
+  localPeerConnection.addStream(localStream);
   localPeerConnection.createOffer(gotLocalDescription,handleError);
 }
 
@@ -247,6 +248,9 @@ function gotLocalDescription(description){
   localPeerConnection.setLocalDescription(description);
   trace("Offer from localPeerConnection: \n" + description.sdp);
   remotePeerConnection.setRemoteDescription(description);
+  remotePeerConnection.createOffer(function(offer) {
+    remotePeerConnection.setLocalDescription(offer);
+  },handleError);
   remotePeerConnection.createAnswer(gotRemoteDescription,handleError);
 }
 
@@ -273,6 +277,7 @@ function gotRemoteStream(event){
 
 function gotLocalIceCandidate(event){
   if (event.candidate) {
+      console.log('ice candidate', event.candidate.candidate);
     remotePeerConnection.addIceCandidate(new RTCIceCandidate(event.candidate));
     trace("Local ICE candidate: \n" + event.candidate.candidate);
   }

@@ -9,7 +9,27 @@
 	<script>
 	  var peer = require('peer');
 
-	  var video = peer();
+	  // master
+	  var master = peer();
+	  // slave
+	  var slave = peer();
+
+
+	  master.use(function(ctx) {
+	  	slave.on('answer', function(offer) {
+	  		console.log('remote answer et local set this offer as remote description');
+	  		master.remote(offer);
+	  	});
+
+	  	master.on('offer', function(offer) {
+	  		console.log('remote set its remote description and create an anwser as local');
+	  		slave.remote(offer);
+	  		slave.answer();
+	  	});
+
+	  });
+
+
 	</script>
 </body>
 </html>
