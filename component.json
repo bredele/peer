@@ -1,0 +1,16 @@
+{
+  "name": "peer",
+  "repo": "bredele/perr",
+  "description": "Create peer connection",
+  "version": "0.0.0",
+  "keywords": [],
+  "dependencies": {
+  },
+  "development": {
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": [
+    "index.js"
+  ]
+}
