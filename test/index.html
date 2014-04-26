@@ -7,49 +7,46 @@
 <body>
 	<video id="master" autoplay muted></video>
   <video id="slave" autoplay muted></video>
+  <video id="test" autoplay muted></video>
 	<script src="../build/build.js"></script>
 	<script>
 	  var peer = require('peer');
+
 	  // master
 	  var master = peer(null, '#master');
-	  master.on('error', function(e) {
-	  	console.log('master error ', e);
-	  });
-
-	  // slave
 	  var slave = peer(null);
-	  slave.on('error', function(e) {
-	  	console.log('slave error ', e);
-	  });
 
-	  master.use(function(ctx) {
-	  	var Candidate = (RTCIceCandidate || mozRTCIceCandidate);
-	  	master.on('candidate', function(candidate) {
-	  		if(candidate) {
-	  			slave.connection.addIceCandidate(new Candidate(candidate));
-	  		}
-	  	});
+		master.use(connect(slave));
 
-	  	slave.on('candidate', function(candidate) {
-	  		if(candidate) {
-	  			master.connection.addIceCandidate(new Candidate(candidate));
-	  		}
-	  	});
+	  function connect(other, node) {
+			return function(ctx) {
+				ctx.on('candidate', function(candidate) {
+					other.ice(candidate);
+				});
 
+				other.on('candidate', function(candidate) {
+					ctx.ice(candidate);
+				});
 
-	  	slave.on('answer', function(offer) {
-	  		console.log('master set remote from slave answer');
-	  		master.remote(offer);
-	  	});
+				other.on('answer', function(offer) {
+					ctx.remote(offer);
+				});
 
-	  	master.once('offer', function(offer) {
-	  		console.log('slave set remote with master offer');
-	  		slave.remote(offer);
-	  		slave.answer();
-	  	});
+				ctx.on('offer', function(offer) {
+					other.remote(offer);
+					other.answer();
+				});
 
-	  });
+				other.on('remote stream', function(stream) {
+					document.querySelector('#slave').src = window.URL.createObjectURL(stream);
+					//attach(stream, node);
+				});
 
+				ctx.on('local stream', function() {
+					ctx.offer();
+				});
+			};
+		}
 
 	</script>
 </body>

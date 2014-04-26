@@ -4,9 +4,8 @@
  * @api private
  */
 
-var Emitter = require('emitter');
 var Queue = require('emitter-queue');
-var media = require('media');
+var Media = require('media');
 var attach = require('attach');
 
 
@@ -17,7 +16,9 @@ var attach = require('attach');
 var PeerConnection = (window.RTCPeerConnection ||
   window.mozRTCPeerConnection ||
   window.webkitRTCPeerConnection);
+
 var Candidate = (RTCIceCandidate || mozRTCIceCandidate);
+
 
 /**
  * Expose 'peer'
@@ -44,26 +45,29 @@ module.exports = Peer;
  * @api public
  */
 
-function Peer(servers, node, options) {
-	if(!(this instanceof Peer)) return new Peer(servers, node, options);
-	this.media = media(options);
+function Peer(servers, node) {
+	if(!(this instanceof Peer)) return new Peer(servers, node);
+	Media.call(this);
 	var _this = this;
-	var connection = this.connection = new PeerConnection(servers || null);
+	this.connection = new PeerConnection(servers || null);
 	this.connection.onaddstream = function(event) {
-		console.log('add stream!!', event);
-		document.querySelector('#slave').src = URL.createObjectURL(event.stream);
+		_this.emit('remote stream', event.stream);
 	};
 	this.connection.onicecandidate = function(event) {
-		_this.emit('candidate', event.candidate);
+		var candidate = event.candidate;
+		if(candidate) _this.emit('candidate', candidate);
 	};
-
+	this.once('stream', function(data, stream, url) {
+		_this.connection.addStream(stream);
+		_this.queue('local stream', stream);
+	});
 	if(node) this.attach(node);
 }
 
 
-// inherit Emitter
+// Peer is also a media
 
-Emitter(Peer.prototype);
+Peer.prototype = Media.prototype;
 Queue(Peer.prototype);
 
 
@@ -75,13 +79,19 @@ Queue(Peer.prototype);
  */
 
 Peer.prototype.attach = function(node) {
-	var _this = this;
-	this.media.on('capture', function(data, stream) {
-		console.log('capture');
-		_this.connection.addStream(stream);
-		_this.offer();
-	});
-	attach(this.media, node);
+	attach(this, node);
+};
+
+
+/**
+ * Set ice candidate.
+ * 
+ * @param  {candidate} candidate
+ * @api private
+ */
+
+Peer.prototype.ice = function(candidate) {
+	this.connection.addIceCandidate(new Candidate(candidate));
 };
 
 
@@ -128,7 +138,6 @@ Peer.prototype.remote = function(session) {
  */
 
 Peer.prototype.offer = function() {
-	console.log('create offer');
 	var _this = this;
 	this.connection.createOffer(function(offer) {
 		_this.connection.setLocalDescription(offer);
@@ -165,24 +174,4 @@ Peer.prototype.answer = function() {
 	},function(e) {
 		_this.emit('error', e);
 	});
-};
-
-
-/**
- * Extend peer with plugins.
- *
- * Examples:
- *
- *   var peer = peer();
- *   peer.use(signal('room'));
- *   
- * @param  {Function} fn 
- * @return {this}
- * @api public
- */
-
-Peer.prototype.use = function(fn) {
-	var args = [].slice.call(arguments, 1);
-	fn.apply(this, [this].concat(args));
-	return this;
 };

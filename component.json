@@ -1,16 +1,17 @@
 {
   "name": "peer",
-  "repo": "bredele/perr",
+  "repo": "bredele/peer",
   "description": "Create peer connection",
   "version": "0.0.0",
   "keywords": [],
   "dependencies": {
-    "component/emitter": "^1.1.2",
     "bredele/emitter-queue": "*",
-    "bredele/media": "~0.1.4",
-    "bredele/attach": "~0.0.2"
+    "bredele/media": "~0.1.5",
+    "bredele/attach": "~0.0.3"
   },
-  "development": {},
+  "development": {
+    "bredele/media": "~0.1.5"
+  },
   "license": "MIT",
   "main": "index.js",
   "scripts": [
