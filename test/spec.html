@@ -240,6 +240,10 @@ function call() {
 
   trace("Added localStream to localPeerConnection");
   // have to attach stream before creating offer
+  
+
+  //localPeerConnection.createOffer(gotLocalDescription,handleError);
+  // we can't create an offer before adding a stream!!
   localPeerConnection.addStream(localStream);
   localPeerConnection.createOffer(gotLocalDescription,handleError);
 }
@@ -248,7 +252,6 @@ function gotLocalDescription(description){
   localPeerConnection.setLocalDescription(description);
   trace("Offer from localPeerConnection: \n" + description.sdp);
   remotePeerConnection.setRemoteDescription(description);
-  remotePeerConnection.createOffer(function(offer) {
     remotePeerConnection.setLocalDescription(offer);
   },handleError);
   remotePeerConnection.createAnswer(gotRemoteDescription,handleError);

@@ -6,6 +6,9 @@
 
 var Emitter = require('emitter');
 var Queue = require('emitter-queue');
+var media = require('media');
+var attach = require('attach');
+
 
 /**
  * Shim
@@ -36,20 +39,25 @@ module.exports = Peer;
  *   var bar = peer(servers);
  *
  * @param {Array} servers
+ * @param {String | Element} node 
+ * @param {Object} options 
  * @api public
  */
 
-function Peer(servers) {
-	if(!(this instanceof Peer)) return new Peer(servers);
+function Peer(servers, node, options) {
+	if(!(this instanceof Peer)) return new Peer(servers, node, options);
+	this.media = media(options);
+	var _this = this;
 	var connection = this.connection = new PeerConnection(servers || null);
-	connection.onicecandidate = function(event) {
-		var candidate = event.candidate;
-		if(candidate) {
-			connection.addIceCandidate(new Candidate(candidate));
-		}
+	this.connection.onaddstream = function(event) {
+		console.log('add stream!!', event);
+		document.querySelector('#slave').src = URL.createObjectURL(event.stream);
 	};
-	// initialize every peer as master
-	this.offer();
+	this.connection.onicecandidate = function(event) {
+		_this.emit('candidate', event.candidate);
+	};
+
+	if(node) this.attach(node);
 }
 
 
@@ -66,10 +74,14 @@ Queue(Peer.prototype);
  * @api private
  */
 
-Peer.prototype.attach = function(stream) {
-
-	//attach stream
-	this.offer();
+Peer.prototype.attach = function(node) {
+	var _this = this;
+	this.media.on('capture', function(data, stream) {
+		console.log('capture');
+		_this.connection.addStream(stream);
+		_this.offer();
+	});
+	attach(this.media, node);
 };
 
 
@@ -110,12 +122,13 @@ Peer.prototype.remote = function(session) {
  *     // do something with offer
  *   });
  *   
- * @api public
+ * @api private
  * 
  * @see  http://github.com/bredele/emitter-queue
  */
 
 Peer.prototype.offer = function() {
+	console.log('create offer');
 	var _this = this;
 	this.connection.createOffer(function(offer) {
 		_this.connection.setLocalDescription(offer);
@@ -139,7 +152,7 @@ Peer.prototype.offer = function() {
  *     // do something with offer
  *   });
  *
- * @api public
+ * @api private
  *
  * @see  http://github.com/bredele/emitter-queue
  */

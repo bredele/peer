@@ -6,7 +6,9 @@
   "keywords": [],
   "dependencies": {
     "component/emitter": "^1.1.2",
-    "bredele/emitter-queue": "*"
+    "bredele/emitter-queue": "*",
+    "bredele/media": "~0.1.4",
+    "bredele/attach": "~0.0.2"
   },
   "development": {},
   "license": "MIT",
