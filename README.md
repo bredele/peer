@@ -1,7 +1,7 @@
 peer
 ====
 
-  webrtc peer connection based on **[media](http://github.com/bredele/media)**
+  flexible and clean webrtc peer connection based on **[datastore](http://github.com/bredele/datastore)**.
 
 ## Installation
 
@@ -12,19 +12,27 @@ with [component](http://github.com/component/component):
 
 ## Usage
  
-  create a local peer connection:
+  initialize a local peer connection with an optional list of servers:
 
 ```js
 var peer = require('peer');
-var master = peer();
+var master = peer(servers);
 ```
 
-  create a local peer connection and **[attach](http://github.com/bredele/attach)** it to a media:
+  set peer constraints (see [datastore](http://github.com/bredele/datastore)):
 
 ```js
-var master = peer(null, '.video');
+master.set('servers', servers);
+master.set('optional', options);
 ```
 
+  create peer connection:
+
+```js
+master.create();
+```
+
+<!-- say about hooks -->
 
 ## API
 
@@ -34,10 +42,21 @@ var master = peer(null, '.video');
 var master = peer(null, '#master');
 var slave = peer();
 
-master.use(connect(slave, '#slave'))
+master.use(connect(slave))
 ```
 
   connect create a local peer-to-peer connection.
+
+
+### create
+
+  create a peer connection
+
+```js
+master.offer();
+```
+
+<!-- to give more flexibility and set constraints -->
 
 ### offer
 
@@ -70,12 +89,23 @@ slave.answer();
 master.ice(candidate);
 ```
 
+
+### stream
+
+  add peer local stream
+
+```js
+master.stream(stream);
+```
+
 ### use
 
   public interface to create plugins.
 
 ```js
-master.use(connect(slave, '#id'));
+master.use(function(peer) {
+  // do something
+});
 ```
 
 Here's a list of available plugins:
@@ -83,6 +113,7 @@ Here's a list of available plugins:
     connect two local peer connection
   - **[signal](http://github.com/bredele/signal)**
     connect two remote peer connection
+
 
 ## License
 
