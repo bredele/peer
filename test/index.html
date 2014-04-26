@@ -39,7 +39,6 @@
 
 				other.on('remote stream', function(stream) {
 					document.querySelector('#slave').src = window.URL.createObjectURL(stream);
-					//attach(stream, node);
 				});
 
 				ctx.on('local stream', function() {
