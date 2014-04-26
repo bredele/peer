@@ -6,8 +6,8 @@
   "keywords": [],
   "dependencies": {
     "bredele/emitter-queue": "*",
-    "bredele/media": "~0.1.5",
-    "bredele/attach": "~0.0.3"
+    "bredele/datastore": "^1.0.5",
+    "bredele/wedge": "~0.1.0"
   },
   "development": {
     "bredele/media": "~0.1.5"

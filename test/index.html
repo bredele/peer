@@ -19,7 +19,9 @@
 		master.use(connect(slave));
 
 	  function connect(other, node) {
+
 			return function(ctx) {
+
 				ctx.on('candidate', function(candidate) {
 					other.ice(candidate);
 				});
@@ -41,6 +43,9 @@
 					document.querySelector('#slave').src = window.URL.createObjectURL(stream);
 				});
 
+	// media.once('stream', function(data, stream, url) {
+	// ctx.stream(stream);
+	// });
 				ctx.on('local stream', function() {
 					ctx.offer();
 				});

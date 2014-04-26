@@ -5,8 +5,8 @@
  */
 
 var Queue = require('emitter-queue');
-var Media = require('media');
-var attach = require('attach');
+var Store = require('datastore');
+var wedge = require('wedge');
 
 
 /**
@@ -16,8 +16,11 @@ var attach = require('attach');
 var PeerConnection = (window.RTCPeerConnection ||
   window.mozRTCPeerConnection ||
   window.webkitRTCPeerConnection);
-
-var Candidate = (RTCIceCandidate || mozRTCIceCandidate);
+var Candidate = RTCIceCandidate || mozRTCIceCandidate;
+var constraints = {
+	optional: [],
+	mandatory: []
+};
 
 
 /**
@@ -31,25 +34,47 @@ module.exports = Peer;
  * Create an initialize peer
  * connection,
  *
- * A peer automatically initialize a master session
- * until it creates an answer.
  *
  * Examples:
  *
  *   var foo = peer();
  *   var bar = peer(servers);
  *
- * @param {Array} servers
- * @param {String | Element} node 
+ * @param {Array} servers optional
  * @param {Object} options 
  * @api public
  */
 
-function Peer(servers, node) {
-	if(!(this instanceof Peer)) return new Peer(servers, node);
-	Media.call(this);
+function Peer(servers) {
+	if(!(this instanceof Peer)) return new Peer(servers);
+	Store.call(this);
+	this.connection = null;
+	this.set('servers', servers);
+	this.set(constraints);
+}
+
+
+// Peer is a datastore
+
+Peer.prototype = Store.prototype;
+Queue(Peer.prototype);
+
+
+
+/**
+ * Create and initialize peer
+ * connection.
+ *
+ * Should be call before offer or answer.
+ * 
+ * @api private
+ */
+
+Peer.prototype.create = function() {
 	var _this = this;
-	this.connection = new PeerConnection(servers || null);
+	var data = wedge(this.data, 'optional', 'mandatory');
+	// should may be format some constraints
+	this.connection = new PeerConnection(this.get('servers') || null, data);
 	this.connection.onaddstream = function(event) {
 		_this.emit('remote stream', event.stream);
 	};
@@ -57,29 +82,20 @@ function Peer(servers, node) {
 		var candidate = event.candidate;
 		if(candidate) _this.emit('candidate', candidate);
 	};
-	this.once('stream', function(data, stream, url) {
-		_this.connection.addStream(stream);
-		_this.queue('local stream', stream);
-	});
-	if(node) this.attach(node);
-}
-
-
-// Peer is also a media
-
-Peer.prototype = Media.prototype;
-Queue(Peer.prototype);
+	this.emit('create', data);
+};
 
 
 /**
- * Attach stream and create offer.
+ * Add local stream to peer connection.
  * 
- * @param  {}
+ * @param  {MediaStream} stream
  * @api private
  */
 
-Peer.prototype.attach = function(node) {
-	attach(this, node);
+Peer.prototype.stream = function(stream) {
+	this.connection.addStream(stream);
+	this.queue('local stream', stream);
 };
 
 
@@ -131,20 +147,22 @@ Peer.prototype.remote = function(session) {
  *   master.on('offer', function(offer) {
  *     // do something with offer
  *   });
- *   
+ *
+ * @param {Object} constraints optional
  * @api private
  * 
  * @see  http://github.com/bredele/emitter-queue
  */
 
-Peer.prototype.offer = function() {
+Peer.prototype.offer = function(opts) {
 	var _this = this;
+	// NOTE we should also pass constraints
 	this.connection.createOffer(function(offer) {
 		_this.connection.setLocalDescription(offer);
 		_this.queue('offer', offer);
 	},function(e) {
 		_this.emit('error', e);
-	});
+	}, opts);
 };
 
 
@@ -160,18 +178,19 @@ Peer.prototype.offer = function() {
  *   slave.on('answer', function(offer) {
  *     // do something with offer
  *   });
- *
+ *   
+ * @param {Object} constraints optional
  * @api private
  *
  * @see  http://github.com/bredele/emitter-queue
  */
 
-Peer.prototype.answer = function() {
+Peer.prototype.answer = function(opts) {
 	var _this = this;
 	this.connection.createAnswer(function(offer) {
 		_this.connection.setLocalDescription(offer);
 		_this.queue('answer', offer);
 	},function(e) {
 		_this.emit('error', e);
-	});
+	}, opts);
 };
