@@ -31,10 +31,12 @@
 				});
 
 				other.on('answer', function(offer) {
+					console.log('answer has been created');
 					ctx.remote(offer);
 				});
 
 				ctx.on('offer', function(offer) {
+					console.log('offer has been created');
 					other.remote(offer);
 					other.answer();
 				});
@@ -46,9 +48,15 @@
 	// media.once('stream', function(data, stream, url) {
 	// ctx.stream(stream);
 	// });
-				ctx.on('local stream', function() {
-					ctx.offer();
-				});
+				// ctx.on('local stream', function() {
+				// 	ctx.offer();
+				// });
+
+			ctx.create();
+			other.create();
+			ctx.offer(function() {
+				console.log(arguments);
+			});
 			};
 		}
 

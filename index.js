@@ -7,6 +7,7 @@
 var Queue = require('emitter-queue');
 var Store = require('datastore');
 var wedge = require('wedge');
+var deus = require('deus');
 
 
 /**
@@ -17,6 +18,7 @@ var PeerConnection = (window.RTCPeerConnection ||
   window.mozRTCPeerConnection ||
   window.webkitRTCPeerConnection);
 var Candidate = RTCIceCandidate || mozRTCIceCandidate;
+var Session = RTCSessionDescription || mozRTCSessionDescription;
 var constraints = {
 	optional: [],
 	mandatory: []
@@ -80,7 +82,7 @@ Peer.prototype.create = function() {
 	};
 	this.connection.onicecandidate = function(event) {
 		var candidate = event.candidate;
-		if(candidate) _this.emit('candidate', candidate);
+		if(candidate) _this.emit('candidate', candidate, event);
 	};
 	this.emit('create', data);
 };
@@ -119,7 +121,7 @@ Peer.prototype.ice = function(candidate) {
  */
 
 Peer.prototype.local = function(session) {
-	this.connection.setLocalDescription(session);
+	this.connection.setLocalDescription(new Session(session));
 };
 
 
@@ -131,7 +133,7 @@ Peer.prototype.local = function(session) {
  */
 
 Peer.prototype.remote = function(session) {
-	this.connection.setRemoteDescription(session);
+	this.connection.setRemoteDescription(new Session(session));
 };
 
 
@@ -154,16 +156,17 @@ Peer.prototype.remote = function(session) {
  * @see  http://github.com/bredele/emitter-queue
  */
 
-Peer.prototype.offer = function(opts) {
+Peer.prototype.offer = deus('function', 'object', function(fn, opts) {
 	var _this = this;
 	// NOTE we should also pass constraints
 	this.connection.createOffer(function(offer) {
 		_this.connection.setLocalDescription(offer);
+		if(fn) fn(offer);
 		_this.queue('offer', offer);
 	},function(e) {
 		_this.emit('error', e);
 	}, opts);
-};
+});
 
 
 /**
@@ -185,15 +188,16 @@ Peer.prototype.offer = function(opts) {
  * @see  http://github.com/bredele/emitter-queue
  */
 
-Peer.prototype.answer = function(opts) {
+Peer.prototype.answer = deus('function', 'object', function(fn, opts) {
 	var _this = this;
 	this.connection.createAnswer(function(offer) {
 		_this.connection.setLocalDescription(offer);
+		if(fn) fn(offer);
 		_this.queue('answer', offer);
 	},function(e) {
 		_this.emit('error', e);
 	}, opts);
-};
+});
 
 
 /**
@@ -203,4 +207,4 @@ Peer.prototype.answer = function(opts) {
  * @api public
  */
 
-Peer.prototype.code = Peer.prototype.use;
+Peer.prototype.codec = Peer.prototype.use;

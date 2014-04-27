@@ -7,7 +7,8 @@
   "dependencies": {
     "bredele/emitter-queue": "*",
     "bredele/datastore": "^1.0.5",
-    "bredele/wedge": "~0.1.0"
+    "bredele/wedge": "~0.1.0",
+    "bredele/deus": "~0.3.3"
   },
   "development": {
     "bredele/media": "~0.1.5"
