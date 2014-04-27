@@ -36,16 +36,10 @@ master.create();
 
 ## API
 
-  The following API is entirely private and should only be access through [plugins](#use). Here's an example with the plugin **[connect](http://github.com/bredele/peer-connect)**:
-
-```js
-var master = peer(null, '#master');
-var slave = peer();
-
-master.use(connect(slave))
-```
-
-  connect create a local peer-to-peer connection.
+  The following API is entirely private and should only be access through [plugins](#use).
+  Here's a list of available plugins:
+  - **[connect](http://github.com/bredele/connect)** creates local peer-to-peer connection
+  - **[channel](http://github.com/bredele/channel)** send data through a peer connection
 
 
 ### create
@@ -107,12 +101,6 @@ master.use(function(peer) {
   // do something
 });
 ```
-
-Here's a list of available plugins:
-  - **[connect](http://github.com/bredele/peer-connect)**
-    connect two local peer connection
-  - **[signal](http://github.com/bredele/signal)**
-    connect two remote peer connection
 
 
 ## License
