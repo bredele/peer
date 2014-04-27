@@ -194,3 +194,13 @@ Peer.prototype.answer = function(opts) {
 		_this.emit('error', e);
 	}, opts);
 };
+
+
+/**
+ * Set peer codes.
+ *
+ * @param {Function} fn
+ * @api public
+ */
+
+Peer.prototype.code = Peer.prototype.use;
