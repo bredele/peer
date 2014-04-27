@@ -17,8 +17,8 @@ var deus = require('deus');
 var PeerConnection = (window.RTCPeerConnection ||
   window.mozRTCPeerConnection ||
   window.webkitRTCPeerConnection);
-var Candidate = RTCIceCandidate || mozRTCIceCandidate;
-var Session = RTCSessionDescription || mozRTCSessionDescription;
+var Candidate = window.RTCIceCandidate || window.mozRTCIceCandidate;
+var Session = window.RTCSessionDescription || window.mozRTCSessionDescription;
 var constraints = {
 	optional: [],
 	mandatory: []
