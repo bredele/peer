@@ -41,7 +41,7 @@ master.create();
   - **[connect](http://github.com/bredele/connect)** creates local peer-to-peer connection
   - **[channel](http://github.com/bredele/channel)** send data through a peer connection
   - **[signal](http://github.com/bredele/signal)** creates remote peer-to-peer connection
-
+  - **[video](http://github.com/bredele/video)** attach video stream to a peer-to-peer connection
 
 ### create
 
