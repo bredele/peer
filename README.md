@@ -36,12 +36,15 @@ master.create();
 
 ## API
 
-  The following API is entirely private and should only be access through [plugins](#use).
+  The following API is entirely private and should only be access through [plugins](#use) or [codecs](#codec).
+
   Here's a list of available plugins:
   - **[connect](http://github.com/bredele/connect)** creates local peer-to-peer connection
   - **[channel](http://github.com/bredele/channel)** send data through a peer connection
   - **[signal](http://github.com/bredele/signal)** creates remote peer-to-peer connection
 
+  Here's a list of available codecs:
+  - **[rate](http://github.com/bredele/rate)** changes data channel speed/rate limitation
 
 ### create
 
@@ -92,6 +95,18 @@ master.ice(candidate);
 ```js
 master.stream(stream);
 ```
+
+### codec
+
+  public interface to set codec on the peer session description.
+
+```js
+master.codec(function(sdp) {
+  // do something on sdp and return result
+});
+```
+
+  codecs are session descriptions filters so make sure your codec return the session description.
 
 ### use
 
