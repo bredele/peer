@@ -2,7 +2,7 @@
   "name": "peer",
   "repo": "bredele/peer",
   "description": "Create peer connection",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "keywords": [],
   "dependencies": {
     "bredele/emitter-queue": "*",
@@ -12,7 +12,7 @@
   },
   "development": {
     "bredele/media": "~0.1.5",
-    "bredele/channel" : "*"
+    "bredele/channel": "*"
   },
   "license": "MIT",
   "main": "index.js",
