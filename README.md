@@ -49,7 +49,7 @@ Here's a list of available codecs:
   - **[opus](http://github.com/bredele/opus)** set opus as preferred audio codec
 
 
-  > a plugin can add codecs as well
+> a plugin can add codecs as well
   
 ### create
 
