@@ -84,7 +84,14 @@ Peer.prototype.create = function() {
 	this.connection.onicecandidate = function(event) {
 		var candidate = event.candidate;
 		if(candidate) _this.emit('candidate', candidate, event);
+		else _this.queue('ready');
 	};
+  this.connection.ongatheringchange =  function(event) {
+    var target = event.currentTarget;
+    if (target && target.iceGatheringState === 'complete') {
+      _this.queue('ready');
+    }
+  };
 	this.emit('create', data);
 };
 
