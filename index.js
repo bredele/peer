@@ -53,6 +53,7 @@ function Peer(servers) {
 	this.connection = null;
 	this.set('servers', servers);
 	this.set(constraints);
+	this.codecs = [];
 }
 
 
@@ -115,12 +116,20 @@ Peer.prototype.ice = function(candidate) {
 
 /**
  * Set local session descriptor.
+ *
+ * If exists, apply codecs on the session
+ * description string.
  * 
  * @param  {RTCSessionDescription} session
  * @api private
  */
 
 Peer.prototype.local = function(session) {
+	var sdp = session.sdp;
+	for(var i = 0, l = this.codecs.length; i < l; i++) {
+		sdp = this.codecs[i](sdp);
+	}
+	session.sdp = sdp;
 	this.connection.setLocalDescription(new Session(session));
 };
 
@@ -201,10 +210,22 @@ Peer.prototype.answer = deus('function', 'object', function(fn, opts) {
 
 
 /**
- * Set peer codes.
+ * Set peer codecs.
+ *
+ * A codec is a function which
+ * modifies the session description
+ * and return a new one.
+ *
+ * Examples:
+ *
+ *   peer.codec(function(session) {
+ *     // do something 
+ *   });
  *
  * @param {Function} fn
  * @api public
  */
 
-Peer.prototype.codec = Peer.prototype.use;
+Peer.prototype.codec = function(fn) {
+	this.codecs.push(fn);
+};

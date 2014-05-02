@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Peer connection</title>
+</head>
+<body>
+	<video id="master" autoplay muted></video>
+  <video id="slave" autoplay muted></video>
+  <video id="test" autoplay muted></video>
+	<script src="../build/build.js"></script>
+	<script>
+	  var peer = require('peer');
+	  var channel = require('channel');
+
+	  // master
+	  var master = peer();
+	  master.use(channel('test'));
+	  master.codec(function(sdp) {
+	  	var split = sdp.split("b=AS:30");
+	  	if(split.length > 1) {
+	  		console.log('split > 1');
+	  		sdp = split[0] + "b=AS:1638400" + split[1];
+	  	}
+	  	return sdp;
+	  });
+	  master.create();
+	  master.offer();
+
+	  master.on('offer', function(offer) {
+	  	master.local(offer);
+	  	console.log(master.connection.localDescription.sdp);
+	  });
+	</script>
+</body>
+</html>

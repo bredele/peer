@@ -11,7 +11,8 @@
     "bredele/deus": "~0.3.3"
   },
   "development": {
-    "bredele/media": "~0.1.5"
+    "bredele/media": "~0.1.5",
+    "bredele/channel" : "*"
   },
   "license": "MIT",
   "main": "index.js",

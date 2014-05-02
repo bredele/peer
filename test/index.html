@@ -13,7 +13,7 @@
 	  var peer = require('peer');
 
 	  // master
-	  var master = peer(null, '#master');
+	  var master = peer(null);
 	  var slave = peer(null);
 
 		master.use(connect(slave));
@@ -23,22 +23,29 @@
 			return function(ctx) {
 
 				ctx.on('candidate', function(candidate) {
+					console.log('candidate generate by master');
 					other.ice(candidate);
+					console.log('candidate generate by master');
 				});
 
 				other.on('candidate', function(candidate) {
+					console.log('candidate generate by slave');
 					ctx.ice(candidate);
+					console.log('candidate generate by master');
 				});
 
 				other.on('answer', function(offer) {
-					console.log('answer has been created');
+					console.log('master get answer');
 					ctx.remote(offer);
+					console.log('slave set remote sdp');
 				});
 
 				ctx.on('offer', function(offer) {
-					console.log('offer has been created');
+					console.log('master generated offer');
 					other.remote(offer);
+					console.log('slave set remote sdp');
 					other.answer();
+					console.log('slave generated answer');
 				});
 
 				other.on('remote stream', function(stream) {
