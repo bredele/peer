@@ -20,8 +20,8 @@ var PeerConnection = (window.RTCPeerConnection ||
 var Candidate = window.RTCIceCandidate || window.mozRTCIceCandidate;
 var Session = window.RTCSessionDescription || window.mozRTCSessionDescription;
 var constraints = {
-	optional: [],
-	mandatory: []
+  optional: [],
+  mandatory: []
 };
 
 
@@ -48,12 +48,12 @@ module.exports = Peer;
  */
 
 function Peer(servers) {
-	if(!(this instanceof Peer)) return new Peer(servers);
-	Store.call(this);
-	this.connection = null;
-	this.set('servers', servers);
-	this.set(constraints);
-	this.codecs = [];
+  if(!(this instanceof Peer)) return new Peer(servers);
+  Store.call(this);
+  this.connection = null;
+  this.set('servers', servers);
+  this.set(constraints);
+  this.codecs = [];
 }
 
 
@@ -74,25 +74,25 @@ Queue(Peer.prototype);
  */
 
 Peer.prototype.create = function() {
-	var _this = this;
-	var data = wedge(this.data, 'optional', 'mandatory');
-	// should may be format some constraints
-	this.connection = new PeerConnection(this.get('servers') || null, data);
-	this.connection.onaddstream = function(event) {
-		_this.emit('remote stream', event.stream);
-	};
-	this.connection.onicecandidate = function(event) {
-		var candidate = event.candidate;
-		if(candidate) _this.emit('candidate', candidate, event);
-		else _this.queue('ready');
-	};
+  var _this = this;
+  var data = wedge(this.data, 'optional', 'mandatory');
+  // should may be format some constraints
+  this.connection = new PeerConnection(this.get('servers') || null, data);
+  this.connection.onaddstream = function(event) {
+    _this.emit('remote stream', event.stream);
+  };
+  this.connection.onicecandidate = function(event) {
+    var candidate = event.candidate;
+    if(candidate) _this.emit('candidate', candidate, event);
+    else _this.queue('ready');
+  };
   this.connection.ongatheringchange =  function(event) {
     var target = event.currentTarget;
     if (target && target.iceGatheringState === 'complete') {
       _this.queue('ready');
     }
   };
-	this.emit('create', data);
+  this.emit('create', data);
 };
 
 
@@ -104,8 +104,8 @@ Peer.prototype.create = function() {
  */
 
 Peer.prototype.stream = function(stream) {
-	this.connection.addStream(stream);
-	this.queue('local stream', stream);
+  this.connection.addStream(stream);
+  this.queue('local stream', stream);
 };
 
 
@@ -117,7 +117,7 @@ Peer.prototype.stream = function(stream) {
  */
 
 Peer.prototype.ice = function(candidate) {
-	this.connection.addIceCandidate(new Candidate(candidate));
+  this.connection.addIceCandidate(new Candidate(candidate));
 };
 
 
@@ -132,12 +132,12 @@ Peer.prototype.ice = function(candidate) {
  */
 
 Peer.prototype.local = function(session) {
-	var sdp = session.sdp;
-	for(var i = 0, l = this.codecs.length; i < l; i++) {
-		sdp = this.codecs[i](sdp);
-	}
-	session.sdp = sdp;
-	this.connection.setLocalDescription(new Session(session));
+  var sdp = session.sdp;
+  for(var i = 0, l = this.codecs.length; i < l; i++) {
+    sdp = this.codecs[i](sdp);
+  }
+  session.sdp = sdp;
+  this.connection.setLocalDescription(new Session(session));
 };
 
 
@@ -149,7 +149,7 @@ Peer.prototype.local = function(session) {
  */
 
 Peer.prototype.remote = function(session) {
-	this.connection.setRemoteDescription(new Session(session));
+  this.connection.setRemoteDescription(new Session(session));
 };
 
 
@@ -173,15 +173,15 @@ Peer.prototype.remote = function(session) {
  */
 
 Peer.prototype.offer = deus('function', 'object', function(fn, opts) {
-	var _this = this;
-	// NOTE we should also pass constraints
-	this.connection.createOffer(function(offer) {
-		_this.connection.setLocalDescription(offer);
-		if(fn) fn(offer);
-		_this.queue('offer', offer);
-	},function(e) {
-		_this.emit('error', e);
-	}, opts);
+  var _this = this;
+  // NOTE we should also pass constraints
+  this.connection.createOffer(function(offer) {
+    _this.connection.setLocalDescription(offer);
+    if(fn) fn(offer);
+    _this.queue('offer', offer);
+  },function(e) {
+    _this.emit('error', e);
+  }, opts);
 });
 
 
@@ -205,14 +205,14 @@ Peer.prototype.offer = deus('function', 'object', function(fn, opts) {
  */
 
 Peer.prototype.answer = deus('function', 'object', function(fn, opts) {
-	var _this = this;
-	this.connection.createAnswer(function(offer) {
-		_this.connection.setLocalDescription(offer);
-		if(fn) fn(offer);
-		_this.queue('answer', offer);
-	},function(e) {
-		_this.emit('error', e);
-	}, opts);
+  var _this = this;
+  this.connection.createAnswer(function(offer) {
+    _this.connection.setLocalDescription(offer);
+    if(fn) fn(offer);
+    _this.queue('answer', offer);
+  },function(e) {
+    _this.emit('error', e);
+  }, opts);
 });
 
 
@@ -234,5 +234,5 @@ Peer.prototype.answer = deus('function', 'object', function(fn, opts) {
  */
 
 Peer.prototype.codec = function(fn) {
-	this.codecs.push(fn);
+  this.codecs.push(fn);
 };
