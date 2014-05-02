@@ -176,7 +176,7 @@ Peer.prototype.offer = deus('function', 'object', function(fn, opts) {
   var _this = this;
   // NOTE we should also pass constraints
   this.connection.createOffer(function(offer) {
-    _this.connection.setLocalDescription(offer);
+    _this.local(offer);
     if(fn) fn(offer);
     _this.queue('offer', offer);
   },function(e) {
@@ -207,7 +207,7 @@ Peer.prototype.offer = deus('function', 'object', function(fn, opts) {
 Peer.prototype.answer = deus('function', 'object', function(fn, opts) {
   var _this = this;
   this.connection.createAnswer(function(offer) {
-    _this.connection.setLocalDescription(offer);
+    _this.local(offer);
     if(fn) fn(offer);
     _this.queue('answer', offer);
   },function(e) {

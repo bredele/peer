@@ -37,7 +37,7 @@
 				other.on('answer', function(offer) {
 					console.log('master get answer');
 					ctx.remote(offer);
-					console.log('slave set remote sdp');
+					console.log('master set remote sdp');
 				});
 
 				ctx.on('offer', function(offer) {
