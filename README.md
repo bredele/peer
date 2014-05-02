@@ -36,19 +36,20 @@ master.create();
 
 ## API
 
-  The following API is entirely private and should only be access through [plugins](#use) or [codecs](#codec).
+The following API is entirely private and should only be access through [plugins](#use) or [codecs](#codec).
 
-  Here's a list of available plugins:
+Here's a list of available plugins:
   - **[connect](http://github.com/bredele/connect)** creates local peer-to-peer connection
   - **[channel](http://github.com/bredele/channel)** send data through a peer connection
   - **[signal](http://github.com/bredele/signal)** creates remote peer-to-peer connection
   - **[video](http://github.com/bredele/video)** attach video stream to a peer-to-peer connection
 
-
-  Here's a list of available codecs:
+Here's a list of available codecs:
   - **[rate](http://github.com/bredele/rate)** changes data channel speed/rate limitation
 
 
+  > a plugin can add codecs as well
+  
 ### create
 
   create a peer connection
