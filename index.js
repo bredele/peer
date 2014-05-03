@@ -33,7 +33,7 @@ module.exports = Peer;
 
 
 /**
- * Create an initialize peer
+ * Create and initialize peer
  * connection,
  *
  *

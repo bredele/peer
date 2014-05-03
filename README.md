@@ -1,7 +1,7 @@
 peer
 ====
 
-  flexible and clean webrtc peer connection based on **[datastore](http://github.com/bredele/datastore)**.
+  composable and clean webrtc peer connection based on **[datastore](http://github.com/bredele/datastore)**.
 
 ## Installation
 
@@ -56,14 +56,16 @@ Here's a list of available codecs:
   create a peer connection
 
 ```js
-master.offer();
+master.create();
 ```
+  
 
 <!-- to give more flexibility and set constraints -->
 
 ### offer
 
-  create an offer (initialize a master session description)
+  create an offer (initialize a master session description) and
+  set local session description.
 
 ```js
 master.offer();
@@ -74,7 +76,8 @@ master.offer();
 
 ### anwer
 
-  create an answer to a remote session description.
+  create an answer (initialize a slave session description) and set
+  local session description.
 
 ```js
 var slave = peer();
@@ -84,14 +87,29 @@ slave.answer();
  A `slave` peer connection is a client (remote or local) which reads
  a shared media.
 
+### local
+
+  set local session description
+
+```js
+master.local(sdp);
+```
+
+### remote
+
+  set remote session description
+
+```js
+master.local(sdp);
+```
+
 ### ice
 
-  set ice candidate
+  set ice (network) candidate
 
 ```js
 master.ice(candidate);
 ```
-
 
 ### stream
 
@@ -122,6 +140,30 @@ master.use(function(peer) {
   // do something
 });
 ```
+
+## Concepts
+
+### plugins
+
+  There is some good webrtc librairies outhere but none of them allow you to compose a peer-to-peer connection. They usually are an abstraction to the entire webrtc API which ironically make them hard to reuse.
+
+  Peer is not a framework, think of it as the minimum amount of glue necessary to create a peer to peer connection. The beauty part is that it provides a mechanism to compose other modules aka plugins. A plugin is trivial and do one thing but do it well. At the end you can compose your webrtc application, reuse some plugins or create your own and get what you really want.
+
+  Oh, and it makes developping a webrtc ridiculously simple. For example, with [channel](http://github.com/bredele/channel) and [video](http://github.com/bredele/video) you can create a skype-like application in 2 lines:
+
+  ```js
+  var skype = peer();
+  skype.use(video('#id'));
+  skype.use(channel('chat'));
+  ```
+
+  Peer has been developped to let flourish an [ecosystem](#api) of plugins.
+
+### codecs
+
+  A session description (SDP) contains all the information needed to initialize a peer connection. It contains for example the types of media to be exchanged (such as audio, video, data), the network topology, the bandwidth information and other metadata.
+
+  A `codec` in peer is a piece of JavaScript which modifies the session description and therfore the parameters of a peer-to-peer communication. You can for example set [opus](http://github.com/bredele/opus) as the preferred type of audio stream or change the speed limitation or a data channel with [rate](http://github.com/bredele/rate).
 
 
 ## License
