@@ -48,6 +48,8 @@ Here's a list of available codecs:
   - **[rate](http://github.com/bredele/rate)** changes data channel speed/rate limitation
   - **[opus](http://github.com/bredele/opus)** set opus as preferred audio codec
 
+Related projects:
+  - **[hangout](http://github.com/bredele/hangout)** peer-to-peer video through localtunnel
 
 > a plugin can add codecs as well
   
