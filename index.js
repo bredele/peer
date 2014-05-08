@@ -8,6 +8,7 @@ var Queue = require('emitter-queue');
 var Store = require('datastore');
 var wedge = require('wedge');
 var deus = require('deus');
+var trace = require('trace')('peer');
 
 
 /**
@@ -63,7 +64,6 @@ Peer.prototype = Store.prototype;
 Queue(Peer.prototype);
 
 
-
 /**
  * Create and initialize peer
  * connection.
@@ -80,11 +80,13 @@ Peer.prototype.create = function() {
   this.connection = new PeerConnection(this.get('servers') || null, data);
   this.connection.onaddstream = function(event) {
     _this.emit('remote stream', event.stream);
+    trace('add remote stream');
   };
   this.connection.onicecandidate = function(event) {
     var candidate = event.candidate;
     if(candidate) _this.emit('candidate', candidate, event);
     else _this.queue('ready');
+    trace('ice candidate');
   };
   this.connection.ongatheringchange =  function(event) {
     var target = event.currentTarget;
@@ -93,6 +95,7 @@ Peer.prototype.create = function() {
     }
   };
   this.emit('create', data);
+  trace('create');
 };
 
 
@@ -106,6 +109,7 @@ Peer.prototype.create = function() {
 Peer.prototype.stream = function(stream) {
   this.connection.addStream(stream);
   this.queue('local stream', stream);
+  trace('add local stream');
 };
 
 
@@ -118,6 +122,7 @@ Peer.prototype.stream = function(stream) {
 
 Peer.prototype.ice = function(candidate) {
   this.connection.addIceCandidate(new Candidate(candidate));
+  trace('add ice candidate');
 };
 
 
@@ -138,6 +143,7 @@ Peer.prototype.local = function(session) {
   }
   session.sdp = sdp;
   this.connection.setLocalDescription(new Session(session));
+  trace('set local description');
 };
 
 
@@ -150,6 +156,7 @@ Peer.prototype.local = function(session) {
 
 Peer.prototype.remote = function(session) {
   this.connection.setRemoteDescription(new Session(session));
+  trace('set remote description');
 };
 
 
@@ -179,6 +186,7 @@ Peer.prototype.offer = deus('function', 'object', function(fn, opts) {
     _this.local(offer);
     if(fn) fn(offer);
     _this.queue('offer', offer);
+    trace('set session offer');
   },function(e) {
     _this.emit('error', e);
   }, opts);
@@ -210,6 +218,7 @@ Peer.prototype.answer = deus('function', 'object', function(fn, opts) {
     _this.local(offer);
     if(fn) fn(offer);
     _this.queue('answer', offer);
+    trace('set session answer');
   },function(e) {
     _this.emit('error', e);
   }, opts);

@@ -11,6 +11,12 @@
 	<script src="../build/build.js"></script>
 	<script>
 	  var peer = require('peer');
+	  var trace = require('trace');
+
+
+	  trace.on('log', function(name, ms, str) {
+	  	console.log(name, ms, str);
+	  });
 
 	  // master
 	  var master = peer(null);
@@ -23,29 +29,20 @@
 			return function(ctx) {
 
 				ctx.on('candidate', function(candidate) {
-					console.log('candidate generate by master');
 					other.ice(candidate);
-					console.log('candidate generate by master');
 				});
 
 				other.on('candidate', function(candidate) {
-					console.log('candidate generate by slave');
 					ctx.ice(candidate);
-					console.log('candidate generate by master');
 				});
 
 				other.on('answer', function(offer) {
-					console.log('master get answer');
 					ctx.remote(offer);
-					console.log('master set remote sdp');
 				});
 
 				ctx.on('offer', function(offer) {
-					console.log('master generated offer');
 					other.remote(offer);
-					console.log('slave set remote sdp');
 					other.answer();
-					console.log('slave generated answer');
 				});
 
 				other.on('remote stream', function(stream) {
@@ -61,9 +58,7 @@
 
 			ctx.create();
 			other.create();
-			ctx.offer(function() {
-				console.log(arguments);
-			});
+			ctx.offer();
 			};
 		}
 
