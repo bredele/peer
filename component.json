@@ -2,7 +2,7 @@
   "name": "peer",
   "repo": "bredele/peer",
   "description": "Create peer connection",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "keywords": [],
   "dependencies": {
     "bredele/emitter-queue": "*",
