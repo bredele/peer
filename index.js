@@ -183,10 +183,10 @@ Peer.prototype.offer = deus('function', 'object', function(fn, opts) {
   var _this = this;
   // NOTE we should also pass constraints
   this.connection.createOffer(function(offer) {
+    trace('set session offer');
     _this.local(offer);
     if(fn) fn(offer);
     _this.queue('offer', offer);
-    trace('set session offer');
   },function(e) {
     _this.emit('error', e);
   }, opts);
@@ -215,10 +215,10 @@ Peer.prototype.offer = deus('function', 'object', function(fn, opts) {
 Peer.prototype.answer = deus('function', 'object', function(fn, opts) {
   var _this = this;
   this.connection.createAnswer(function(offer) {
+    trace('set session answer');
     _this.local(offer);
     if(fn) fn(offer);
     _this.queue('answer', offer);
-    trace('set session answer');
   },function(e) {
     _this.emit('error', e);
   }, opts);
