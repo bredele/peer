@@ -161,6 +161,31 @@ Peer.prototype.remote = function(session) {
 
 
 /**
+ * Create offer or answer
+ * session description.
+ * 
+ * @param  {Function} fn
+ * @param  {Object}   constraints
+ * @param  {String}   type=
+ * @api private
+ */
+
+Peer.prototype.session = deus('function', 'object', function(fn, opts, type) {
+  var _this = this;
+  var handler = (type === 'offer') ? 'createOffer' : 'createAnswer';
+  this.emit('before ' + type);
+  this.connection[handler](function(offer) {
+    trace('set session ' + type);
+    _this.local(offer);
+    if(fn) fn(offer);
+    _this.queue(type, offer);
+  },function(e) {
+    _this.emit('error', e);
+  }, opts);
+});
+
+
+/**
  * Initialize master peer connection
  * and create offer.
  *
@@ -179,18 +204,9 @@ Peer.prototype.remote = function(session) {
  * @see  http://github.com/bredele/emitter-queue
  */
 
-Peer.prototype.offer = deus('function', 'object', function(fn, opts) {
-  var _this = this;
-  // NOTE we should also pass constraints
-  this.connection.createOffer(function(offer) {
-    trace('set session offer');
-    _this.local(offer);
-    if(fn) fn(offer);
-    _this.queue('offer', offer);
-  },function(e) {
-    _this.emit('error', e);
-  }, opts);
-});
+Peer.prototype.offer = function(fn, opts) {
+  this.session(fn, opts, 'offer');
+};
 
 
 /**
@@ -212,17 +228,9 @@ Peer.prototype.offer = deus('function', 'object', function(fn, opts) {
  * @see  http://github.com/bredele/emitter-queue
  */
 
-Peer.prototype.answer = deus('function', 'object', function(fn, opts) {
-  var _this = this;
-  this.connection.createAnswer(function(offer) {
-    trace('set session answer');
-    _this.local(offer);
-    if(fn) fn(offer);
-    _this.queue('answer', offer);
-  },function(e) {
-    _this.emit('error', e);
-  }, opts);
-});
+Peer.prototype.answer = function(fn, opts) {
+  this.session(fn, opts, 'answer');
+};
 
 
 /**

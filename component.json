@@ -8,7 +8,7 @@
     "bredele/emitter-queue": "*",
     "bredele/datastore": "^1.0.5",
     "bredele/wedge": "~0.1.0",
-    "bredele/deus": "~0.3.3",
+    "bredele/deus": "~0.3.5",
     "bredele/trace": "*"
   },
   "development": {
