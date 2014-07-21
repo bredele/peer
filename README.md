@@ -147,8 +147,6 @@ master.use(function(peer) {
 
 ### plugins
 
-  There is some good webrtc librairies outhere but none of them allow you to compose a peer-to-peer connection. They usually are an abstraction to the entire webrtc API which ironically make them hard to reuse.
-
   Peer is not a framework, think of it as the minimum amount of glue necessary to create a peer to peer connection. The beauty part is that it provides a mechanism to compose other modules aka plugins. A plugin is trivial and do one thing but do it well. At the end you can compose your webrtc application, reuse some plugins or create your own and get what you really want.
 
   Oh, and it makes developping a webrtc ridiculously simple. For example, with [channel](http://github.com/bredele/channel) and [video](http://github.com/bredele/video) you can create a skype-like application in 2 lines:
