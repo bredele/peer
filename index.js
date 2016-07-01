@@ -4,6 +4,7 @@
  * @api private
  */
 
+var constraints = require('constraints');
 var Emitter = require('emitter');
 var Queue = require('emitter-queue');
 // var trace = require('trace')('peer');
@@ -41,15 +42,15 @@ module.exports = Peer;
  *   var foo = peer();
  *   var bar = peer(servers);
  *
- * @param {Array} servers optional
+ * @param {Array} options
  * @param {Object} options
  * @api public
  */
 
-function Peer(servers) {
-  if(!(this instanceof Peer)) return new Peer(servers);
+function Peer(options) {
+  if(!(this instanceof Peer)) return new Peer(options);
   this.connection = null;
-  this.constraints = {};
+  this.constraints = constraints(options);
   this.codecs = [];
 }
 
@@ -69,7 +70,7 @@ Queue(Peer.prototype);
 
 Peer.prototype.create = function() {
   var that = this;
-  this.connection = new PeerConnection(null);
+  this.connection = new PeerConnection(this.constraints.servers());
   this.connection.onaddstream = function(event) {
     that.emit('remote stream', event.stream);
     //trace('add remote stream');
@@ -196,8 +197,8 @@ Peer.prototype.session = function(fn, opts, type) {
  * @see  http://github.com/bredele/emitter-queue
  */
 
-Peer.prototype.offer = function(fn, opts) {
-  this.session(fn, opts, 'offer');
+Peer.prototype.offer = function(fn, constraints) {
+  this.session(fn, constraints, 'offer');
 };
 
 
@@ -220,8 +221,8 @@ Peer.prototype.offer = function(fn, opts) {
  * @see  http://github.com/bredele/emitter-queue
  */
 
-Peer.prototype.answer = function(fn, opts) {
-  this.session(fn, opts, 'answer');
+Peer.prototype.answer = function(fn, constraints) {
+  this.session(fn, constraints, 'answer');
 };
 
 

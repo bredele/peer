@@ -10,6 +10,7 @@
     "emitter": "emitter-component"
   },
   "dependencies": {
+    "constraints": "github:bredele/constraints",
     "emitter-component": "^1.1.1",
     "emitter-queue": "^0.1.2"
   },
