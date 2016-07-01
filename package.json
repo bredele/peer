@@ -1,0 +1,28 @@
+{
+  "name": "peer",
+  "version": "1.0.0",
+  "description": "clean API in top of WebRTC peer connection ",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bredele/peer.git"
+  },
+  "keywords": [
+    "webrtc",
+    "peer"
+  ],
+  "author": "Olivier Wietrich",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bredele/peer/issues"
+  },
+  "homepage": "https://github.com/bredele/peer#readme"
+}

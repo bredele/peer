@@ -1,17 +1,16 @@
 peer
 ====
 
-  composable and clean webrtc peer connection based on **[datastore](http://github.com/bredele/datastore)**.
+  Composable and clean webrtc peer connection.
 
 ## Installation
 
-with [component](http://github.com/component/component):
 
-	$ component install bredele/peer
+	$ npm install bredele/peer --save
 
 
 ## Usage
- 
+
   initialize a local peer connection with an optional list of servers:
 
 ```js
@@ -52,7 +51,7 @@ Related projects:
   - **[hangout](http://github.com/bredele/hangout)** peer-to-peer video through localtunnel
 
 > a plugin can add codecs as well
-  
+
 ### create
 
   create a peer connection
@@ -60,7 +59,7 @@ Related projects:
 ```js
 master.create();
 ```
-  
+
 
 <!-- to give more flexibility and set constraints -->
 
@@ -74,7 +73,7 @@ master.offer();
 ```
 
  A `master` peer connection is a client which shares a media.
-  
+
 
 ### anwer
 
