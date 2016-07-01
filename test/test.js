@@ -5,8 +5,14 @@
 var peer = require('..');
 
 // master
-var master = peer(null);
-var slave = peer(null);
+master = peer(null);
+slave = peer(null);
+master.on('message', function() {
+  console.log('master message');
+});
+slave.on('message', function() {
+  console.log('slave message');
+});
 
 master.use(connect(slave));
 

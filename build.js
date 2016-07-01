@@ -5,8 +5,10 @@
  * @api private
  */
 
+var constraints = require('constraints');
 var Emitter = require('emitter');
 var Queue = require('emitter-queue');
+var channel = require('./lib/channel');
 // var trace = require('trace')('peer');
 
 
@@ -19,10 +21,11 @@ var PeerConnection = (window.RTCPeerConnection ||
   window.webkitRTCPeerConnection);
 var Candidate = window.RTCIceCandidate || window.mozRTCIceCandidate;
 var Session = window.RTCSessionDescription || window.mozRTCSessionDescription;
-var constraints = {
-  optional: [],
-  mandatory: []
-};
+// var constraints = {
+//   optional: [],
+//   mandatory: [],
+//   channel: true
+// };
 
 
 /**
@@ -42,14 +45,15 @@ module.exports = Peer;
  *   var foo = peer();
  *   var bar = peer(servers);
  *
- * @param {Array} servers optional
+ * @param {Array} options
  * @param {Object} options
  * @api public
  */
 
-function Peer(servers) {
-  if(!(this instanceof Peer)) return new Peer(servers);
+function Peer(options) {
+  if(!(this instanceof Peer)) return new Peer(options);
   this.connection = null;
+  this.constraints = constraints(options);
   this.codecs = [];
 }
 
@@ -69,7 +73,7 @@ Queue(Peer.prototype);
 
 Peer.prototype.create = function() {
   var that = this;
-  this.connection = new PeerConnection(null);
+  this.connection = new PeerConnection(this.constraints.servers());
   this.connection.onaddstream = function(event) {
     that.emit('remote stream', event.stream);
     //trace('add remote stream');
@@ -113,7 +117,7 @@ Peer.prototype.stream = function(stream) {
  */
 
 Peer.prototype.ice = function(candidate) {
-  this.connection.addIceCandidate(new Candidate(candidate));
+  if(candidate) this.connection.addIceCandidate(new Candidate(candidate));
   //trace('add ice candidate');
 };
 
@@ -196,8 +200,9 @@ Peer.prototype.session = function(fn, opts, type) {
  * @see  http://github.com/bredele/emitter-queue
  */
 
-Peer.prototype.offer = function(fn, opts) {
-  this.session(fn, opts, 'offer');
+Peer.prototype.offer = function(fn, constraints) {
+  this.channel = channel(this.connection.createDataChannel('master'), this);
+  this.session(fn, constraints, 'offer');
 };
 
 
@@ -220,8 +225,24 @@ Peer.prototype.offer = function(fn, opts) {
  * @see  http://github.com/bredele/emitter-queue
  */
 
-Peer.prototype.answer = function(fn, opts) {
-  this.session(fn, opts, 'answer');
+Peer.prototype.answer = function(fn, constraints) {
+  var that = this;
+  this.connection.ondatachannel = function(event) {
+    this.channel = channel(event.channel, that);
+  };
+  this.session(fn, constraints, 'answer');
+};
+
+
+/**
+ * Return peer connection state.
+ *
+ * @return {String}
+ * @api public
+ */
+
+Peer.prototype.state = function() {
+  return this.connection.signalingState;
 };
 
 
@@ -244,6 +265,28 @@ Peer.prototype.answer = function(fn, opts) {
 
 Peer.prototype.codec = function(fn) {
   this.codecs.push(fn);
+  return this;
+};
+
+
+
+/**
+ * Send message.
+ *
+ * A message will be sent through a data channel only
+ * if a channel has been openned through the constraints.
+ *
+ * Examples:
+ *
+ *  peer.send('hello');
+ *
+ * @return {this}
+ * @api public
+ */
+
+Peer.prototype.send = function(msg) {
+  this.queue('channel message', msg);
+  return this;
 };
 
 
@@ -265,7 +308,88 @@ Peer.prototype.use = function(fn) {
   return this;
 };
 
-},{"emitter":2,"emitter-queue":3}],2:[function(require,module,exports){
+},{"./lib/channel":2,"constraints":3,"emitter":4,"emitter-queue":5}],2:[function(require,module,exports){
+
+
+/**
+ * Listen channel.
+ *
+ * @note this handler will be replaced by
+ * the module bredele/channel
+ *
+ * @param {RTCDataChannel} channel
+ * @param {Peer} peer
+ * @api private
+ */
+
+module.exports = function(channel, peer) {
+
+  peer.on('channel message', function(msg) {
+    channel.send(msg);
+  });
+
+  channel.onmessage = function (event) {
+    peer.emit('message', event.data)
+  }
+  channel.onopen = function () {
+    peer.emit('channel open', name)
+  }
+  channel.onclose = function () {
+    peer.emit('channel close', name)
+  }
+  return channel;
+};
+
+},{}],3:[function(require,module,exports){
+
+
+/**
+ * Expose 'constraints'
+ *
+ * @api public
+ */
+
+module.exports = function(options) {
+
+  var that = {}
+
+  that.audio = function() {
+
+  }
+
+  that.video = function() {
+
+  }
+
+  that.servers = function() {
+
+  }
+
+  that.channel =  function() {
+
+  }
+
+  that.media = function() {
+
+  }
+
+  that.peer = function() {
+
+  }
+
+  that.session = function() {
+    
+  }
+
+  // will return new constraints object
+  that.select = function() {
+
+  }
+
+  return that
+}
+
+},{}],4:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -431,7 +555,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],3:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 
 /**
  * Expose 'Queue'
@@ -505,7 +629,7 @@ function Queue(emitter) {
 
 }
 
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /**
  * Test dependencies.
  */
@@ -513,8 +637,14 @@ function Queue(emitter) {
 var peer = require('..');
 
 // master
-var master = peer(null);
-var slave = peer(null);
+master = peer(null);
+slave = peer(null);
+master.on('message', function() {
+  console.log('master message');
+});
+slave.on('message', function() {
+  console.log('slave message');
+});
 
 master.use(connect(slave));
 
@@ -553,4 +683,4 @@ function connect(other, node) {
   };
 }
 
-},{"..":1}]},{},[4]);
+},{"..":1}]},{},[6]);

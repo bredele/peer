@@ -7,6 +7,7 @@
 var constraints = require('constraints');
 var Emitter = require('emitter');
 var Queue = require('emitter-queue');
+var channel = require('./lib/channel');
 // var trace = require('trace')('peer');
 
 
@@ -19,11 +20,11 @@ var PeerConnection = (window.RTCPeerConnection ||
   window.webkitRTCPeerConnection);
 var Candidate = window.RTCIceCandidate || window.mozRTCIceCandidate;
 var Session = window.RTCSessionDescription || window.mozRTCSessionDescription;
-var constraints = {
-  optional: [],
-  mandatory: [],
-  channel: true
-};
+// var constraints = {
+//   optional: [],
+//   mandatory: [],
+//   channel: true
+// };
 
 
 /**
@@ -87,9 +88,6 @@ Peer.prototype.create = function() {
     if (target && target.iceGatheringState === 'complete') {
       that.queue('ready');
     }
-  };
-  this.connection.ondatachannel = function(event) {
-    console.log('channel!!!');
   };
   this.emit('create');
   //trace('create');
@@ -202,6 +200,7 @@ Peer.prototype.session = function(fn, opts, type) {
  */
 
 Peer.prototype.offer = function(fn, constraints) {
+  this.channel = channel(this.connection.createDataChannel('master'), this);
   this.session(fn, constraints, 'offer');
 };
 
@@ -226,6 +225,10 @@ Peer.prototype.offer = function(fn, constraints) {
  */
 
 Peer.prototype.answer = function(fn, constraints) {
+  var that = this;
+  this.connection.ondatachannel = function(event) {
+    this.channel = channel(event.channel, that);
+  };
   this.session(fn, constraints, 'answer');
 };
 
@@ -281,7 +284,7 @@ Peer.prototype.codec = function(fn) {
  */
 
 Peer.prototype.send = function(msg) {
-  this.queue('message', msg);
+  this.queue('channel message', msg);
   return this;
 };
 
