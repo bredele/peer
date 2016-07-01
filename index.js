@@ -49,6 +49,7 @@ module.exports = Peer;
 function Peer(servers) {
   if(!(this instanceof Peer)) return new Peer(servers);
   this.connection = null;
+  this.constraints = {};
   this.codecs = [];
 }
 
