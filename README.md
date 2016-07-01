@@ -15,7 +15,7 @@ peer
 
 ```js
 var peer = require('peer');
-var master = peer(servers);
+var master = peer();
 ```
 
   create peer connection:
