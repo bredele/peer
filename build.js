@@ -162,7 +162,7 @@ Peer.prototype.remote = function(session) {
  * @api private
  */
 
-Peer.prototype.session = deus('function', 'object', function(fn, opts, type) {
+Peer.prototype.session = function(fn, opts, type) {
   var that = this;
   var handler = (type === 'offer') ? 'createOffer' : 'createAnswer';
   this.emit('before ' + type);
@@ -174,7 +174,7 @@ Peer.prototype.session = deus('function', 'object', function(fn, opts, type) {
   },function(e) {
     that.emit('error', e);
   }, opts);
-});
+};
 
 
 /**
