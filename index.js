@@ -4,10 +4,8 @@
  * @api private
  */
 
+var Emitter = require('emitter');
 var Queue = require('emitter-queue');
-var Store = require('datastore');
-var wedge = require('wedge');
-var deus = require('deus');
 var trace = require('trace')('peer');
 
 
@@ -44,23 +42,18 @@ module.exports = Peer;
  *   var bar = peer(servers);
  *
  * @param {Array} servers optional
- * @param {Object} options 
+ * @param {Object} options
  * @api public
  */
 
 function Peer(servers) {
   if(!(this instanceof Peer)) return new Peer(servers);
-  Store.call(this);
   this.connection = null;
-  this.set('servers', servers);
-  this.set(constraints);
   this.codecs = [];
 }
 
 
-// Peer is a datastore
-
-Peer.prototype = Store.prototype;
+Emitter(Peer.prototype);
 Queue(Peer.prototype);
 
 
@@ -69,15 +62,13 @@ Queue(Peer.prototype);
  * connection.
  *
  * Should be call before offer or answer.
- * 
+ *
  * @api private
  */
 
 Peer.prototype.create = function() {
   var _this = this;
-  var data = wedge(this.data, 'optional', 'mandatory');
-  // should may be format some constraints
-  this.connection = new PeerConnection(this.get('servers') || null, data);
+  this.connection = new PeerConnection(null, data);
   this.connection.onaddstream = function(event) {
     _this.emit('remote stream', event.stream);
     trace('add remote stream');
@@ -101,7 +92,7 @@ Peer.prototype.create = function() {
 
 /**
  * Add local stream to peer connection.
- * 
+ *
  * @param  {MediaStream} stream
  * @api private
  */
@@ -115,7 +106,7 @@ Peer.prototype.stream = function(stream) {
 
 /**
  * Set ice candidate.
- * 
+ *
  * @param  {candidate} candidate
  * @api private
  */
@@ -131,7 +122,7 @@ Peer.prototype.ice = function(candidate) {
  *
  * If exists, apply codecs on the session
  * description string.
- * 
+ *
  * @param  {RTCSessionDescription} session
  * @api private
  */
@@ -149,7 +140,7 @@ Peer.prototype.local = function(session) {
 
 /**
  * Set remote session descriptor.
- * 
+ *
  * @param  {RTCSessionDescription} session
  * @api private
  */
@@ -163,7 +154,7 @@ Peer.prototype.remote = function(session) {
 /**
  * Create offer or answer
  * session description.
- * 
+ *
  * @param  {Function} fn
  * @param  {Object}   constraints
  * @param  {String}   type=
@@ -200,7 +191,7 @@ Peer.prototype.session = deus('function', 'object', function(fn, opts, type) {
  *
  * @param {Object} constraints optional
  * @api private
- * 
+ *
  * @see  http://github.com/bredele/emitter-queue
  */
 
@@ -221,7 +212,7 @@ Peer.prototype.offer = function(fn, opts) {
  *   slave.on('answer', function(offer) {
  *     // do something with offer
  *   });
- *   
+ *
  * @param {Object} constraints optional
  * @api private
  *
@@ -243,7 +234,7 @@ Peer.prototype.answer = function(fn, opts) {
  * Examples:
  *
  *   peer.codec(function(session) {
- *     // do something 
+ *     // do something
  *   });
  *
  * @param {Function} fn
