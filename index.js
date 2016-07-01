@@ -67,22 +67,22 @@ Queue(Peer.prototype);
  */
 
 Peer.prototype.create = function() {
-  var _this = this;
+  var that = this;
   this.connection = new PeerConnection(null, data);
   this.connection.onaddstream = function(event) {
-    _this.emit('remote stream', event.stream);
+    that.emit('remote stream', event.stream);
     trace('add remote stream');
   };
   this.connection.onicecandidate = function(event) {
     var candidate = event.candidate;
-    if(candidate) _this.emit('candidate', candidate, event);
-    else _this.queue('ready');
+    if(candidate) that.emit('candidate', candidate, event);
+    else that.queue('ready');
     trace('ice candidate');
   };
   this.connection.ongatheringchange =  function(event) {
     var target = event.currentTarget;
     if (target && target.iceGatheringState === 'complete') {
-      _this.queue('ready');
+      that.queue('ready');
     }
   };
   this.emit('create', data);
@@ -162,16 +162,16 @@ Peer.prototype.remote = function(session) {
  */
 
 Peer.prototype.session = deus('function', 'object', function(fn, opts, type) {
-  var _this = this;
+  var that = this;
   var handler = (type === 'offer') ? 'createOffer' : 'createAnswer';
   this.emit('before ' + type);
   this.connection[handler](function(offer) {
     trace('set session ' + type);
-    _this.local(offer);
+    that.local(offer);
     if(fn) fn(offer);
-    _this.queue(type, offer);
+    that.queue(type, offer);
   },function(e) {
-    _this.emit('error', e);
+    that.emit('error', e);
   }, opts);
 });
 

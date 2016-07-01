@@ -7,7 +7,8 @@
     "test": "test"
   },
   "dependencies": {
-    "emitter-component": "^1.1.1"
+    "emitter-component": "^1.1.1",
+    "emitter-queue": "^0.1.2"
   },
   "devDependencies": {},
   "scripts": {
