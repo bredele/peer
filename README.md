@@ -18,13 +18,6 @@ var peer = require('peer');
 var master = peer(servers);
 ```
 
-  set peer constraints (see [datastore](http://github.com/bredele/datastore)):
-
-```js
-master.set('servers', servers);
-master.set('optional', options);
-```
-
   create peer connection:
 
 ```js
