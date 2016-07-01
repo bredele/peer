@@ -20,11 +20,6 @@ var PeerConnection = (window.RTCPeerConnection ||
   window.webkitRTCPeerConnection);
 var Candidate = window.RTCIceCandidate || window.mozRTCIceCandidate;
 var Session = window.RTCSessionDescription || window.mozRTCSessionDescription;
-// var constraints = {
-//   optional: [],
-//   mandatory: [],
-//   channel: true
-// };
 
 
 /**
@@ -52,7 +47,12 @@ module.exports = Peer;
 function Peer(options) {
   if(!(this instanceof Peer)) return new Peer(options);
   this.connection = null;
-  this.constraints = constraints(options);
+  // we should extend default with options
+  this.constraints = constraints({
+    optional: [],
+    mandatory: [],
+    channel: true
+  });
   this.codecs = [];
 }
 
@@ -227,7 +227,7 @@ Peer.prototype.offer = function(fn, constraints) {
 Peer.prototype.answer = function(fn, constraints) {
   var that = this;
   this.connection.ondatachannel = function(event) {
-    this.channel = channel(event.channel, that);
+    that.channel = channel(event.channel, that);
   };
   this.session(fn, constraints, 'answer');
 };
