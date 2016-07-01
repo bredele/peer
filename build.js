@@ -69,7 +69,7 @@ Queue(Peer.prototype);
 
 Peer.prototype.create = function() {
   var that = this;
-  this.connection = new PeerConnection(null, data);
+  this.connection = new PeerConnection(null);
   this.connection.onaddstream = function(event) {
     that.emit('remote stream', event.stream);
     //trace('add remote stream');
@@ -86,7 +86,7 @@ Peer.prototype.create = function() {
       that.queue('ready');
     }
   };
-  this.emit('create', data);
+  this.emit('create');
   //trace('create');
 };
 
@@ -244,6 +244,25 @@ Peer.prototype.answer = function(fn, opts) {
 
 Peer.prototype.codec = function(fn) {
   this.codecs.push(fn);
+};
+
+
+/**
+ * Use middlewares to extend peer.
+ *
+ * Examples:
+ *
+ *   peer.use(plugin, 'something');
+ *
+ * @param  {Function} fn
+ * @return {this}
+ * @api public
+ */
+
+Peer.prototype.use = function(fn) {
+  var args = [].slice.call(arguments, 1);
+  fn.apply(this, [this].concat(args));
+  return this;
 };
 
 },{"emitter":2,"emitter-queue":3}],2:[function(require,module,exports){

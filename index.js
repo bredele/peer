@@ -68,7 +68,7 @@ Queue(Peer.prototype);
 
 Peer.prototype.create = function() {
   var that = this;
-  this.connection = new PeerConnection(null, data);
+  this.connection = new PeerConnection(null);
   this.connection.onaddstream = function(event) {
     that.emit('remote stream', event.stream);
     //trace('add remote stream');
@@ -85,7 +85,7 @@ Peer.prototype.create = function() {
       that.queue('ready');
     }
   };
-  this.emit('create', data);
+  this.emit('create');
   //trace('create');
 };
 
