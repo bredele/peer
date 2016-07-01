@@ -113,6 +113,17 @@ master.ice(candidate);
 master.stream(stream);
 ```
 
+### message
+
+  send a message through the peer connection
+
+```js
+master.send('hello')
+```
+
+a message will be sent through a data channel if initialized by constraints
+
+
 ### codec
 
   public interface to set codec on the peer session description.
