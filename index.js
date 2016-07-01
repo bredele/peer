@@ -6,7 +6,7 @@
 
 var Emitter = require('emitter');
 var Queue = require('emitter-queue');
-var trace = require('trace')('peer');
+// var trace = require('trace')('peer');
 
 
 /**
@@ -71,13 +71,13 @@ Peer.prototype.create = function() {
   this.connection = new PeerConnection(null, data);
   this.connection.onaddstream = function(event) {
     that.emit('remote stream', event.stream);
-    trace('add remote stream');
+    //trace('add remote stream');
   };
   this.connection.onicecandidate = function(event) {
     var candidate = event.candidate;
     if(candidate) that.emit('candidate', candidate, event);
     else that.queue('ready');
-    trace('ice candidate');
+    //trace('ice candidate');
   };
   this.connection.ongatheringchange =  function(event) {
     var target = event.currentTarget;
@@ -86,7 +86,7 @@ Peer.prototype.create = function() {
     }
   };
   this.emit('create', data);
-  trace('create');
+  //trace('create');
 };
 
 
@@ -100,7 +100,7 @@ Peer.prototype.create = function() {
 Peer.prototype.stream = function(stream) {
   this.connection.addStream(stream);
   this.queue('local stream', stream);
-  trace('add local stream');
+  //trace('add local stream');
 };
 
 
@@ -113,7 +113,7 @@ Peer.prototype.stream = function(stream) {
 
 Peer.prototype.ice = function(candidate) {
   this.connection.addIceCandidate(new Candidate(candidate));
-  trace('add ice candidate');
+  //trace('add ice candidate');
 };
 
 
@@ -134,7 +134,7 @@ Peer.prototype.local = function(session) {
   }
   session.sdp = sdp;
   this.connection.setLocalDescription(new Session(session));
-  trace('set local description');
+  //trace('set local description');
 };
 
 
@@ -147,7 +147,7 @@ Peer.prototype.local = function(session) {
 
 Peer.prototype.remote = function(session) {
   this.connection.setRemoteDescription(new Session(session));
-  trace('set remote description');
+  //trace('set remote description');
 };
 
 
@@ -166,7 +166,7 @@ Peer.prototype.session = deus('function', 'object', function(fn, opts, type) {
   var handler = (type === 'offer') ? 'createOffer' : 'createAnswer';
   this.emit('before ' + type);
   this.connection[handler](function(offer) {
-    trace('set session ' + type);
+    //trace('set session ' + type);
     that.local(offer);
     if(fn) fn(offer);
     that.queue(type, offer);
