@@ -112,7 +112,7 @@ Peer.prototype.stream = function(stream) {
  */
 
 Peer.prototype.ice = function(candidate) {
-  this.connection.addIceCandidate(new Candidate(candidate));
+  if(candidate) this.connection.addIceCandidate(new Candidate(candidate));
   //trace('add ice candidate');
 };
 
@@ -221,6 +221,18 @@ Peer.prototype.offer = function(fn, opts) {
 
 Peer.prototype.answer = function(fn, opts) {
   this.session(fn, opts, 'answer');
+};
+
+
+/**
+ * Return peer connection state.
+ *
+ * @return {String}
+ * @api public
+ */
+
+Peer.prototype.state = function() {
+  return this.connection.signalingState;
 };
 
 
