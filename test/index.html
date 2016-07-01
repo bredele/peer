@@ -8,60 +8,6 @@
 	<video id="master" autoplay muted></video>
   <video id="slave" autoplay muted></video>
   <video id="test" autoplay muted></video>
-	<script src="../build/build.js"></script>
-	<script>
-	  var peer = require('peer');
-	  var trace = require('trace');
-
-
-	  trace.on('log', function(name, ms, str) {
-	  	console.log(name, ms, str);
-	  });
-
-	  // master
-	  var master = peer(null);
-	  var slave = peer(null);
-
-		master.use(connect(slave));
-
-	  function connect(other, node) {
-
-			return function(ctx) {
-
-				ctx.on('candidate', function(candidate) {
-					other.ice(candidate);
-				});
-
-				other.on('candidate', function(candidate) {
-					ctx.ice(candidate);
-				});
-
-				other.on('answer', function(offer) {
-					ctx.remote(offer);
-				});
-
-				ctx.on('offer', function(offer) {
-					other.remote(offer);
-					other.answer();
-				});
-
-				other.on('remote stream', function(stream) {
-					document.querySelector('#slave').src = window.URL.createObjectURL(stream);
-				});
-
-	// media.once('stream', function(data, stream, url) {
-	// ctx.stream(stream);
-	// });
-				// ctx.on('local stream', function() {
-				// 	ctx.offer();
-				// });
-
-			ctx.create();
-			other.create();
-			ctx.offer();
-			};
-		}
-
-	</script>
+	<script src="../build.js"></script>
 </body>
 </html>

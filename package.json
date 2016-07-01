@@ -6,13 +6,20 @@
   "directories": {
     "test": "test"
   },
+  "browser": {
+    "emitter": "emitter-component"
+  },
   "dependencies": {
     "emitter-component": "^1.1.1",
     "emitter-queue": "^0.1.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "browserify": "^13.0.1",
+    "serve": "^1.4.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "browserify test/test.js > build.js",
+    "test": "npm run build && serve"
   },
   "repository": {
     "type": "git",
