@@ -256,6 +256,28 @@ Peer.prototype.state = function() {
 
 Peer.prototype.codec = function(fn) {
   this.codecs.push(fn);
+  return this;
+};
+
+
+
+/**
+ * Send message.
+ *
+ * A message will be sent through a data channel only
+ * if a channel has been openned through the constraints.
+ *
+ * Examples:
+ *
+ *  peer.send('hello');
+ *
+ * @return {this}
+ * @api public
+ */
+
+Peer.prototype.send = function(msg) {
+  this.queue('message', msg);
+  return this;
 };
 
 
