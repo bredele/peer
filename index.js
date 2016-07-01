@@ -21,7 +21,8 @@ var Candidate = window.RTCIceCandidate || window.mozRTCIceCandidate;
 var Session = window.RTCSessionDescription || window.mozRTCSessionDescription;
 var constraints = {
   optional: [],
-  mandatory: []
+  mandatory: [],
+  channel: true
 };
 
 
