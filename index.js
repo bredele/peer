@@ -52,7 +52,7 @@ function Peer(options) {
     optional: [],
     mandatory: [],
     channel: true
-  });
+  }, options);
   this.codecs = [];
 }
 
