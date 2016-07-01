@@ -87,6 +87,9 @@ Peer.prototype.create = function() {
       that.queue('ready');
     }
   };
+  this.connection.ondatachannel = function(event) {
+    console.log('channel!!!');
+  };
   this.emit('create');
   //trace('create');
 };
