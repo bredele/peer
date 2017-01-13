@@ -94,7 +94,7 @@ master.local(sdp);
   set remote session description
 
 ```js
-master.local(sdp);
+master.remote(sdp);
 ```
 
 ### ice
